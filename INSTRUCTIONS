@@ -1,0 +1,43 @@
+
+SQL for sqlite tables:
+---------------------+
+
+        -- INDEX
+        CREATE UNIQUE INDEX version_local_idx on conde_info_local(version)
+        CREATE UNIQUE INDEX version_onedrive_idx on conde_info_onedrive(version)
+
+        -- TABLE: conde_info_local 
+        CREATE TABLE conde_info_local (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name TEXT,
+            version TEXT,
+            path_local TEXT NOT NULL,
+	        path_onedrive TEXT NOT NULL,
+	        type INT NOT NULL,
+            id_onedrive TEXT,
+            id_father_onedrive TEXT,
+            sha1 TEXT,
+            dt_created DATETIME,
+            dt_modified DATETIME
+        );
+
+        -- TABLE: conde_info_onedrive
+        CREATE TABLE conde_info_onedrive (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name TEXT,
+            version TEXT,
+	        path_local TEXT NOT NULL,
+	        path_onedrive TEXT NOT NULL,
+            type INT NOT NULL,
+            id_onedrive TEXT NOT NULL,
+            id_father_onedrive TEXT,
+            sha1 TEXT,
+            dt_created DATETIME,
+            dt_modified DATETIME
+       );
+
+Dependencies:
+
+* onedrivesdk
+* pillow
+* requests version 2.6.1 (a versão mais nova não permite o upload)
