@@ -213,17 +213,33 @@ class CondeUtils(object):
             else:
                 exists_in_table = True
                 version_tb = ret[0][2]
-                list_hier = ret[0][4].split("/")
-                list_hier = codutils.get_hierarchy_dir_item(item_root, item)
+                name_split = ret[0][1].split('/')
+
+                if len(name_split) == 0:
+                    name_split = None
+                if len(name_split) == 1:
+                    name_split = ret[0][1]
+                elif len(name_split) > 1:
+                    name_split = ret[0][1].split('/')[-1:][0]
+                
+                if (not name_split is None) and isinstance(name_split, str) and name_split == item.name:
+                    if ret[0][5] == 2: # file | arquivo
+                        path_db = ret[0][4] + '/' + name_split
+                        list_hier = path_db.split('/')
+                        list_hier.pop(0)
+                    else:
+                        list_hier = codutils.get_hierarchy_dir_item(item_root, item)
+                else:
+                    list_hier = codutils.get_hierarchy_dir_item(item_root, item)
 
             name = ""
             type_item = self.get_type_item(item)
-            path_onedrive = self.convert_list_to_str(list_hier, '/')
+            list_hier.pop(0)
+            path_onedrive = key_root + '/' + self.convert_list_to_str(list_hier, '/')
             dt_created = item.created_date_time
             dt_modified = item.last_modified_date_time
 
             if len(list_hier) > 1:
-                list_hier.pop(0)
                 path_local_dir = path_local + '/' + self.convert_list_to_str(list_hier, '/')
             else:
                 path_local_dir = path_local
@@ -231,7 +247,6 @@ class CondeUtils(object):
             # if directory in root but not root | caso diretorio esteja na raiz mas não seja a raiz.
             if item.id != item_root.id and len(list_hier) == 1:
                 path_local_dir = path_local + '/' + item.name
-                path_onedrive = key_root + '/' + item.name
 
             version = None
             sha1 = None
