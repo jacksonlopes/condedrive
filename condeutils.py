@@ -7,6 +7,7 @@ __email__  = jacksonlopes@gmail.com
 import os
 import time
 import hashlib
+import logging
 from stat import ST_INO
 from datetime import datetime
 from datetime import timedelta
@@ -18,6 +19,7 @@ from condesqlremote import CondeSqlRemote
 class CondeUtils(object):
     """Class for utils methods local."""
     csql = None
+    log  = logging.getLogger(CondeConstants().LOGGER_NAME)
 
     def __init__(self):
         self.csql = CondeSql()
@@ -172,7 +174,7 @@ class CondeUtils(object):
 
         return list_sql_insert, list_sql_update
 
-    def convert_hash_onedrive_files_to_update(self, client, key_root, path_local, item_root, list_items):
+    def convert_hash_onedrive_files_to_up(self, client, key_root, path_local, item_root, list_items):
         """Convert hash onedrive to update/insert sql instruction.
 
            Args:
@@ -189,8 +191,14 @@ class CondeUtils(object):
         list_sql_update = []
         list_versions = []
         counter = 0
+        counter_pos = 0
         csqlremote = CondeSqlRemote()
+        size_items = len(list_items)
         for item in list_items:
+
+            counter_pos += 1
+            if counter_pos % 100 == 0:
+                self.log.info("*  " + str(counter_pos) + " ... " + str(size_items))
             # get full path...
             # Tenho que obter o caminho completo ate o arquivo, ou seja, até o pai.
             # str_hier_dir -- TESTE/de/FOTOS/alegre
@@ -210,6 +218,7 @@ class CondeUtils(object):
             if len(ret) == 0:
                 # not exist | Nao existe
                 list_hier = codutils.get_hierarchy_dir_item(item_root, item)
+                list_hier.pop(0)
             else:
                 exists_in_table = True
                 version_tb = ret[0][2]
@@ -221,20 +230,25 @@ class CondeUtils(object):
                     name_split = ret[0][1]
                 elif len(name_split) > 1:
                     name_split = ret[0][1].split('/')[-1:][0]
-                
+
                 if (not name_split is None) and isinstance(name_split, str) and name_split == item.name:
                     if ret[0][5] == 2: # file | arquivo
                         path_db = ret[0][4] + '/' + name_split
                         list_hier = path_db.split('/')
-                        list_hier.pop(0)
+                        for r_inx in range(0, len(key_root.split('/'))):
+                            if len(list_hier) == 0:
+                                break
+                            else:
+                                list_hier.pop(0)
                     else:
                         list_hier = codutils.get_hierarchy_dir_item(item_root, item)
+                        list_hier.pop(0)
                 else:
                     list_hier = codutils.get_hierarchy_dir_item(item_root, item)
+                    list_hier.pop(0)
 
             name = ""
             type_item = self.get_type_item(item)
-            list_hier.pop(0)
             path_onedrive = key_root + '/' + self.convert_list_to_str(list_hier, '/')
             dt_created = item.created_date_time
             dt_modified = item.last_modified_date_time

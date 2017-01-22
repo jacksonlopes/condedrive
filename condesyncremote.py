@@ -60,7 +60,7 @@ class CondeSyncRemote(object):
             for name in v_dir.keys():
                 # v_dir[name] => 'TESTE/de/FOTOS'
                 item_root = self.codutils.enter_hierarchy_directory_onedrive(v_dir[name], CondeConstants().DEFAULT_ONEDRIVE_DIR)
-                self.cutils.convert_hash_onedrive_files_to_update(self.client, v_dir[name], name, item_root, self.codutils.get_all_list_items(item_root))
+                self.cutils.convert_hash_onedrive_files_to_up(self.client, v_dir[name], name, item_root, self.codutils.get_all_list_items(item_root))
 
     def sync(self):
         """Call sync_onedrive_to_local.
@@ -235,7 +235,11 @@ class CondeSyncRemote(object):
             id_onedrive         = o_drive[6]
             id_father_onedrive  = o_drive[7]
             sha1                = o_drive[8]
-            dt_created          = datetime.strptime(o_drive[9], "%Y-%m-%d %H:%M:%S.%f")
+            try:
+                dt_created = datetime.strptime(o_drive[9], "%Y-%m-%d %H:%M:%S.%f")
+            except ValueError:
+                dt_created = datetime.strptime(o_drive[9], "%Y-%m-%d %H:%M:%S")
+            
             try:
                 dt_modified = datetime.strptime(o_drive[10], "%Y-%m-%d %H:%M:%S.%f")
             except ValueError:
