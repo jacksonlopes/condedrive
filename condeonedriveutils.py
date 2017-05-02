@@ -252,11 +252,17 @@ class CondeOnedriveUtils(object):
              path_local_save (str): path local for save
              filename (str): filename
            Returns:
-             None
+             True: OK
+             False: Error
         """
         if not isinstance(item, str):
             item = item.id
-        self.client.item(id=item).download(path_local_save + '/' + filename)
+        try:
+            self.client.item(id=item).download(path_local_save + '/' + filename)
+            return True
+        except:
+            os.remove(path_local_save + '/' + filename)
+            return False
 
     def renamed_item(self, item, name):
         """Rename file in Onedrive.

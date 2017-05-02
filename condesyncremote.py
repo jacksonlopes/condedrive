@@ -253,7 +253,9 @@ class CondeSyncRemote(object):
 
             self.log.info("** down file: " + path_local + '/' + name)
             item = self.codutils.get_item_by_id(id_onedrive)
-            self.codutils.download(item, path_local, name)
+            if self.codutils.download(item, path_local, name) == False:
+                self.log.info("** ERROR down file: " + path_local + '/' + name)
+                continue
             version = self.cutils.get_version_file_or_dir(path_local + '/' + name)
 
             # insert in conde_info_local and up and onedrive | Inserir na tabela conde_info_local e atualizar na onedrive
@@ -329,7 +331,9 @@ class CondeSyncRemote(object):
 
             self.log.info("** down file: " + path_local + '/' + name)
             item = self.codutils.get_item_by_id(id_onedrive)
-            self.codutils.download(item, path_local, name)
+            if self.codutils.download(item, path_local, name) == False:
+                self.log.info("** ERROR down file: " + path_local + '/' + name)
+                continue
             new_version = self.cutils.get_version_file_or_dir(path_local + '/' + name)
 
             # update in tables with new version | Atualiza tabelas com nova version
