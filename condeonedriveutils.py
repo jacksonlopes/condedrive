@@ -176,15 +176,18 @@ class CondeOnedriveUtils(object):
            Returns:
              (list) List hierarchy
         """
-        hierarchy = []
+        hierarchy = []                
+        if item.id == root.id:
+            hierarchy.append(root.name)
+            return hierarchy
+        str_tmp = item.parent_reference.path.split(':')[1][1:]
+        if str_tmp.count('/') > 0:
+            hierarchy = str_tmp.split('/')
+        else:
+            # get only string, no /
+            hierarchy.append(item.parent_reference.path.split(':')[1][1:])
         hierarchy.append(item.name)
-        while True:
-            if item.id == root.id:
-                break
-            item = self.get_dir_root(item)
-            item = self.get_item_by_id(item)
-            hierarchy.append(item.name)
-        return hierarchy[::-1] # reverse list | lista reversa
+        return hierarchy
 
     def get_dir_root(self, item):
         """Get father Item.

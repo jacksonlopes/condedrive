@@ -133,8 +133,15 @@ class CondeSyncRemote(object):
                 os.makedirs(odir[3])
 
                 version = self.cutils.get_version_file_or_dir(odir[3])
-                dt_created = datetime.strptime(odir[9], "%Y-%m-%d %H:%M:%S.%f")
-                dt_modified = datetime.strptime(odir[10], "%Y-%m-%d %H:%M:%S.%f")
+                try:
+                    dt_created = datetime.strptime(odir[9], "%Y-%m-%d %H:%M:%S.%f")
+                except ValueError:
+                    dt_created = datetime.strptime(odir[9], "%Y-%m-%d %H:%M:%S")
+                
+                try:
+                    dt_modified = datetime.strptime(odir[10], "%Y-%m-%d %H:%M:%S.%f")
+                except ValueError:
+                    dt_modified = datetime.strptime(odir[10], "%Y-%m-%d %H:%M:%S")
 
                 values = (None, version, odir[3], odir[4], 1, odir[6], odir[7], None, dt_created, dt_modified)
                 # insert in table | insere registro na tabela local
