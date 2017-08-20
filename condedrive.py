@@ -64,18 +64,19 @@ class CondeDrive(object):
             self.client.auth_provider.authenticate(code, self.redirect_uri, self.client_secret)
             self.client.auth_provider.save_session()
 
-    def sync(self, dir_sync, dir_rules):
+    def sync(self, dir_sync, dir_rules,file_rules):
         """Sync local <==> onedrive.
 
            Args:
              dir_sync (array): list directory in format: {'/home/jsl/imagens/teste_conde': 'Pictures/teste_conde'}]
              dir_rules (dict):  rules upload/download only
+             file_rules (dict): rules upload/download only
            Returns:
              None
         """
         try:
-            slocal = CondeSyncLocal(self.client, dir_sync, dir_rules)
-            sremote = CondeSyncRemote(self.client, dir_sync, dir_rules)
+            slocal = CondeSyncLocal(self.client, dir_sync, dir_rules, file_rules)
+            sremote = CondeSyncRemote(self.client, dir_sync, dir_rules, file_rules)
             ctoken = CondeToken(self.client)
 
             # Refresh token X in X minutes | Atualiza token de sessão de X em X minutos

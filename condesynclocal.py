@@ -19,16 +19,17 @@ from condesqllocal import CondeSqlLocal
 
 class CondeSyncLocal(object):
     """Class for sync local => onedrive."""
-    client    = None
-    csql      = None
-    cutils    = None
-    codutils  = None
-    csqllocal = None
-    log       = logging.getLogger(CondeConstants().LOGGER_NAME)
-    dir_sync  = None
-    dir_rules = None
+    log        = logging.getLogger(CondeConstants().LOGGER_NAME)
+    client     = None
+    csql       = None
+    cutils     = None
+    codutils   = None
+    csqllocal  = None    
+    dir_sync   = None
+    dir_rules  = None
+    file_rules = None
 
-    def __init__(self, client, dir_sync, dir_rules):
+    def __init__(self, client, dir_sync, dir_rules, file_rules):
         self.client = client
         self.csql = CondeSql()
         self.cutils = CondeUtils()
@@ -36,6 +37,7 @@ class CondeSyncLocal(object):
         self.csqllocal = CondeSqlLocal()
         self.dir_sync = dir_sync
         self.dir_rules = dir_rules
+        self.file_rules = file_rules
 
     def pre_sync(self):
         """Call update_local_table.

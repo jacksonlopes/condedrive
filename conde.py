@@ -20,6 +20,7 @@ class Conde(object):
     CLIENT_ID         = None
     DIR_SYNC          = None
     DIR_RULES         = {}
+    FILE_RULES         = {}
     log               = None
 
     def __init__(self):
@@ -43,7 +44,7 @@ class Conde(object):
         os.system("notify-send condedrive 'Init SYNC condedrive...'")
         cmain = CondeDrive(CondeConstants().REDIRECT_URI, self.CLIENT_SECRET, self.CLIENT_ID, CondeConstants().SCOPES)
         cmain.authenticate()
-        cmain.sync(self.DIR_SYNC, self.DIR_RULES)
+        cmain.sync(self.DIR_SYNC, self.DIR_RULES, self.FILE_RULES)
         self.log.info("****** \o/ END \o/ ******")
         os.system("notify-send condedrive 'End SYNC condedrive...'")
 
@@ -68,8 +69,10 @@ class Conde(object):
             self.LOG_FILE = config["LOG"]["filename"]
             self.FILE_LOG_DEBUG = config["LOG"]["filename_debug"]
             self.DIR_SYNC = []
-            self.DIR_RULES["only_onedrive"] = [x.strip() for x in config["RULES_DIRECTORY"]["only_onedrive"].split(',')]
-            self.DIR_RULES["only_local"] = [x.strip() for x in config["RULES_DIRECTORY"]["only_local"].split(',')]
+            self.DIR_RULES["only_onedrive"] = [x.strip() for x in config["DIRECTORIES_RULES"]["only_onedrive"].split(',')]
+            self.DIR_RULES["only_local"] = [x.strip() for x in config["DIRECTORIES_RULES"]["only_local"].split(',')]
+            self.FILE_RULES["only_onedrive"] = [x.strip() for x in config["FILES_RULES"]["only_onedrive"].split(',')]
+            self.FILE_RULES["only_local"] = [x.strip() for x in config["FILES_RULES"]["only_local"].split(',')]            
             # Create array: [{'/home/jsl/imagens/teste_conde': 'Pictures/teste_conde'}]
             # local directory : remote directory
             # Cria um array na forma: [{'/home/jsl/imagens/teste_conde': 'Pictures/teste_conde'}]

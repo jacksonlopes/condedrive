@@ -19,6 +19,7 @@ from condesqlremote import CondeSqlRemote
 
 class CondeSyncRemote(object):
     """Class for sync onedrive => local."""
+    log        = logging.getLogger(CondeConstants().LOGGER_NAME)
     client     = None
     csql       = None
     cutils     = None
@@ -26,9 +27,9 @@ class CondeSyncRemote(object):
     csqlremote = None
     dir_sync   = None
     dir_rules  = None
-    log        = logging.getLogger(CondeConstants().LOGGER_NAME)
+    file_rules = None    
 
-    def __init__(self, client, dir_sync, dir_rules):
+    def __init__(self, client, dir_sync, dir_rules, file_rules):
         self.client = client
         self.csql = CondeSql()
         self.cutils = CondeUtils()
@@ -36,6 +37,7 @@ class CondeSyncRemote(object):
         self.csqlremote = CondeSqlRemote()
         self.dir_sync = dir_sync
         self.dir_rules = dir_rules
+        self.file_rules = file_rules
 
     def pre_sync(self):
         """Call enter_hierarchy_directory_onedrive.
@@ -59,6 +61,7 @@ class CondeSyncRemote(object):
         for v_dir in self.dir_sync:
             for name in v_dir.keys():
                 # v_dir[name] => 'TESTE/de/FOTOS'
+                self.log.info("*** " + v_dir[name])
                 item_root = self.codutils.enter_hierarchy_directory_onedrive(v_dir[name], CondeConstants().DEFAULT_ONEDRIVE_DIR)
                 self.cutils.convert_hash_onedrive_files_to_up(self.client, v_dir[name], name, item_root, self.codutils.get_all_list_items(item_root))
 

@@ -8,6 +8,7 @@ import os
 import time
 import hashlib
 import logging
+from math import trunc
 from stat import ST_INO
 from datetime import datetime
 from datetime import timedelta
@@ -24,6 +25,18 @@ class CondeUtils(object):
     def __init__(self):
         self.csql = CondeSql()
 
+    def print_info_perc(self,counter_pos,size_items):
+        """Print info progress:
+
+           Args:
+             counter_pos (int): position
+             size_items (int): total elements
+           Returns:
+             None
+        """
+        if counter_pos % 200 == 0:
+            self.log.info("* " + str(counter_pos) + " ... " + str(size_items))
+
     def get_list_files_in_hierarchy(self, path_origin):
         """Create hash in format:
            hash[nome_diretorio] = {nome_arquivo : [data_criação,data_alteração,sha1,version]}
@@ -36,9 +49,13 @@ class CondeUtils(object):
         """
         hash_dir = {}
         for path, dirs, files in os.walk(path_origin):
+            self.log.info("*** " + path)
             hash_dir[path] = {}
+            counter_pos = 0
 
             for f in files:
+                counter_pos += 1
+                self.print_info_perc(counter_pos,len(files))
                 info_arq = hash_dir[path]
                 info_arq[f] = []
                 info_arq[f].append(self.get_create_file_datetime(os.path.join(path, f)))
@@ -197,8 +214,7 @@ class CondeUtils(object):
         for item in list_items:
 
             counter_pos += 1
-            if counter_pos % 100 == 0:
-                self.log.info("*  " + str(counter_pos) + " ... " + str(size_items))
+            self.print_info_perc(counter_pos,size_items)
             # get full path...
             # Tenho que obter o caminho completo ate o arquivo, ou seja, até o pai.
             # str_hier_dir -- TESTE/de/FOTOS/alegre
@@ -218,7 +234,6 @@ class CondeUtils(object):
             if len(ret) == 0:
                 # not exist | Nao existe
                 list_hier = codutils.get_hierarchy_dir_item(item_root, item)
-                list_hier.pop(0)
             else:
                 exists_in_table = True
                 version_tb = ret[0][2]
@@ -238,30 +253,26 @@ class CondeUtils(object):
                         for r_inx in range(0, len(key_root.split('/'))):
                             if len(list_hier) == 0:
                                 break
-                            else:
-                                list_hier.pop(0)
                     else:
                         list_hier = codutils.get_hierarchy_dir_item(item_root, item)
-                        list_hier.pop(0)
                 else:
                     list_hier = codutils.get_hierarchy_dir_item(item_root, item)
-                    list_hier.pop(0)
 
             name = ""
             type_item = self.get_type_item(item)
-            path_onedrive = key_root + '/' + self.convert_list_to_str(list_hier, '/')
+            path_onedrive = self.convert_list_to_str(list_hier, '/')
             dt_created = item.created_date_time
             dt_modified = item.last_modified_date_time
 
             if len(list_hier) > 1:
-                path_local_dir = path_local + '/' + self.convert_list_to_str(list_hier, '/')
+                path_local_dir = path_local + '/' + path_onedrive[len(key_root)+1:]
             else:
                 path_local_dir = path_local
 
             # if directory in root but not root | caso diretorio esteja na raiz mas não seja a raiz.
             if item.id != item_root.id and len(list_hier) == 1:
                 path_local_dir = path_local + '/' + item.name
-
+            
             version = None
             sha1 = None
             if type_item == 1: # directory | diretorio
