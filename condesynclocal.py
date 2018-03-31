@@ -140,11 +140,13 @@ class CondeSyncLocal(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. directories created: " + str(len(ldir_created)))
         for ldir in ldir_created:
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], str(ldir[3])):
-                self.log.info("** keep directory only locally: " + str(ldir[3]))
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], str(ldir[3])):                
+                self.cutils.print_check_rules("** keep directory only locally: ",str(ldir[3]),lpr_rules)
+                lpr_rules.append(str(ldir[3]))
                 continue
 
             self.log.info("** creating directory in ONEDRIVE: " + str(ldir[3]))
@@ -165,11 +167,13 @@ class CondeSyncLocal(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. renamed directories: " + str(len(ldir_renamed)))
         for ldir in ldir_renamed:
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], str(ldir[3])):
-                self.log.info("** keep directory only locally: " + str(ldir[3]))
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], str(ldir[3])):                
+                self.cutils.print_check_rules("** keep directory only locally: ",str(ldir[3]),lpr_rules)
+                lpr_rules.append(str(ldir[3]))
                 continue
 
             # get registry in table | Obtenho registro na tabela onedrive
@@ -244,6 +248,7 @@ class CondeSyncLocal(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. files created/updated: " + str(len(files_created)))
         for f_local in files_created:
             name          = f_local[1]
@@ -252,8 +257,9 @@ class CondeSyncLocal(object):
             path_onedrive = f_local[4]
             sha1          = f_local[8]
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], path_local):
-                self.log.info("** keep directory only locally: " + path_local)
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], path_local):                
+                self.cutils.print_check_rules("** keep directory only locally: ",path_local,lpr_rules)
+                lpr_rules.append(path_local)
                 continue
 
             item = self.codutils.enter_hierarchy_directory_onedrive(path_onedrive, CondeConstants().DEFAULT_ONEDRIVE_DIR)
@@ -276,6 +282,7 @@ class CondeSyncLocal(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. renamed files: " + str(len(files_renamed)))
         for f_local in files_renamed:
             name          = f_local[1]
@@ -286,8 +293,9 @@ class CondeSyncLocal(object):
             dt_modified   = f_local[10]
             id_onedrive   = f_local[6]
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], path_local):
-                self.log.info("** keep directory only locally: " + path_local)
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], path_local):                
+                self.cutils.print_check_rules("** keep directory only locally: ",path_local,lpr_rules)
+                lpr_rules.append(path_local)
                 continue
 
             item = self.codutils.get_item_by_id(id_onedrive)
@@ -311,6 +319,7 @@ class CondeSyncLocal(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. altered files: " + str(len(files_modified)))
         for f_local in files_modified:
             name          = f_local[1]
@@ -321,8 +330,9 @@ class CondeSyncLocal(object):
             sha1          = f_local[8]
             dt_modified   = f_local[10]
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], path_local):
-                self.log.info("** keep directory only locally: " + path_local)
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_local"], path_local):                
+                self.cutils.print_check_rules("** keep directory only locally: ",path_local,lpr_rules)
+                lpr_rules.append(path_local)
                 continue
 
             # get Item | Obtém Item

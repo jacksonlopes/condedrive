@@ -21,6 +21,7 @@ class CondeSql(object):
              None
         """
         self.conn = sqlite3.connect(CondeConstants().NAME_DATABASE, check_same_thread=False)
+        self.conn.execute("PRAGMA journal_mode=WAL")
 
     def execute_simple(self, sql):
         """Insert/update/remove simple sql.

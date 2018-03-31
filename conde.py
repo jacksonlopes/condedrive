@@ -20,7 +20,7 @@ class Conde(object):
     CLIENT_ID         = None
     DIR_SYNC          = None
     DIR_RULES         = {}
-    FILE_RULES         = {}
+    FILE_RULES        = {}
     log               = None
 
     def __init__(self):

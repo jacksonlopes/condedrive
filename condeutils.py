@@ -25,7 +25,20 @@ class CondeUtils(object):
     def __init__(self):
         self.csql = CondeSql()
 
-    def print_info_perc(self,counter_pos,size_items):
+    def print_check_rules(self,str_info,str_check,ldir):
+        """Print info progress:
+
+           Args:
+             str_info (str): str information
+             str_check (str): string to check
+             ldir (list): list strings
+           Returns:
+             None
+        """
+        if str_check not in ldir:
+            self.log.info(str_info + str_check)        
+
+    def print_info_perc(self,path,counter_pos,size_items):
         """Print info progress:
 
            Args:
@@ -34,8 +47,11 @@ class CondeUtils(object):
            Returns:
              None
         """
-        if counter_pos % 200 == 0:
-            self.log.info("* " + str(counter_pos) + " ... " + str(size_items))
+        perc = round(counter_pos * 100 / size_items,2)
+        if perc % 10 == 0 or counter_pos == size_items -1:
+            if counter_pos == size_items -1:
+                perc = 100.0
+            self.log.info("* " + path + " - " + str(perc) + "%")
 
     def get_list_files_in_hierarchy(self, path_origin):
         """Create hash in format:
@@ -55,7 +71,7 @@ class CondeUtils(object):
 
             for f in files:
                 counter_pos += 1
-                self.print_info_perc(counter_pos,len(files))
+                self.print_info_perc(path,counter_pos,len(files))
                 info_arq = hash_dir[path]
                 info_arq[f] = []
                 info_arq[f].append(self.get_create_file_datetime(os.path.join(path, f)))
@@ -214,7 +230,7 @@ class CondeUtils(object):
         for item in list_items:
 
             counter_pos += 1
-            self.print_info_perc(counter_pos,size_items)
+            self.print_info_perc(path_local,counter_pos,size_items)
             # get full path...
             # Tenho que obter o caminho completo ate o arquivo, ou seja, até o pai.
             # str_hier_dir -- TESTE/de/FOTOS/alegre

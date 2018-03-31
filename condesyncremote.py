@@ -7,6 +7,7 @@ __email__  = jacksonlopes@gmail.com
 import os
 import logging
 import onedrivesdk
+import threading
 from stat import *
 from datetime import datetime
 from onedrivesdk.helpers import GetAuthCodeServer
@@ -58,12 +59,24 @@ class CondeSyncRemote(object):
              None
         """
         self.log.info("* UP 'conde_info_onedrive'")
+        lst_threads = []
         for v_dir in self.dir_sync:
             for name in v_dir.keys():
                 # v_dir[name] => 'TESTE/de/FOTOS'
-                self.log.info("*** " + v_dir[name])
-                item_root = self.codutils.enter_hierarchy_directory_onedrive(v_dir[name], CondeConstants().DEFAULT_ONEDRIVE_DIR)
-                self.cutils.convert_hash_onedrive_files_to_up(self.client, v_dir[name], name, item_root, self.codutils.get_all_list_items(item_root))
+                #self.log.info("*** " + v_dir[name])
+                t = threading.Thread(target=self.convert_hash_onedrive, args=(v_dir[name],name,))
+                lst_threads.append(t)
+                #item_root = self.codutils.enter_hierarchy_directory_onedrive(v_dir[name], CondeConstants().DEFAULT_ONEDRIVE_DIR)
+                #self.cutils.convert_hash_onedrive_files_to_up(self.client, v_dir[name], name, item_root, self.codutils.get_all_list_items(item_root))
+        for st in lst_threads:
+            st.start()
+        for st in lst_threads:
+            st.join()
+
+    def convert_hash_onedrive(self,v_dir_name,name):
+        self.log.info("*** " + v_dir_name)
+        item_root = self.codutils.enter_hierarchy_directory_onedrive(v_dir_name, CondeConstants().DEFAULT_ONEDRIVE_DIR)
+        self.cutils.convert_hash_onedrive_files_to_up(self.client, v_dir_name, name, item_root, self.codutils.get_all_list_items(item_root))
 
     def sync(self):
         """Call sync_onedrive_to_local.
@@ -123,11 +136,13 @@ class CondeSyncRemote(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. directories created: " + str(len(odir_created)))
         for odir in odir_created:
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], odir[4]):
-                self.log.info("** keep directory only in onedrive: " + odir[4])
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], odir[4]):                
+                self.cutils.print_check_rules("** keep directory only in onedrive: ",odir[4],lpr_rules)
+                lpr_rules.append(odir[4])
                 continue
 
             self.log.info("** creating directory in LOCAL: " + odir[3])
@@ -160,11 +175,13 @@ class CondeSyncRemote(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. renamed directories: " + str(len(odir_renamed)))
         for odir in odir_renamed:
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], odir[4]):
-                self.log.info("** keep directory only in onedrive " + odir[4])
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], odir[4]):                
+                self.cutils.print_check_rules("** keep directory only in onedrive: ",odir[4],lpr_rules)
+                lpr_rules.append(odir[4])
                 continue
 
             # get registry in table | Obtenho registro na tabela local
@@ -235,8 +252,8 @@ class CondeSyncRemote(object):
            Returns:
              None
         """
-        self.log.info("* No. files created/updated: " + str(len(files_created)))
-        list_print = []
+        lpr_rules = []
+        self.log.info("* No. files created/updated: " + str(len(files_created)))        
         for o_drive in files_created:
             name                = o_drive[1]
             version             = o_drive[2]
@@ -255,10 +272,9 @@ class CondeSyncRemote(object):
             except ValueError:
                 dt_modified = datetime.strptime(o_drive[10], "%Y-%m-%d %H:%M:%S")
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], path_onedrive):
-                if path_local not in list_print:
-                    self.log.info("** keep directory only in onedrive: " + path_onedrive)
-                list_print.append(path_local)
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], path_onedrive):                
+                self.cutils.print_check_rules("** keep directory only in onedrive: ",path_onedrive,lpr_rules)
+                lpr_rules.append(path_onedrive)
                 continue
 
             self.log.info("** down file: " + path_local + '/' + name)
@@ -281,6 +297,7 @@ class CondeSyncRemote(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. renamed files: " + str(len(files_renamed)))
         for o_drive in files_renamed:
             name          = o_drive[1]
@@ -291,8 +308,9 @@ class CondeSyncRemote(object):
             sha1          = o_drive[8]
             dt_modified   = o_drive[10]
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], path_onedrive):
-                self.log.info("** keep directory only in onedrive: " + path_onedrive)
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], path_onedrive):                
+                self.cutils.print_check_rules("** keep directory only in onedrive: ",path_onedrive,lpr_rules)
+                lpr_rules.append(path_onedrive)
                 continue
 
             # get data | Obtém dados local
@@ -321,6 +339,7 @@ class CondeSyncRemote(object):
            Returns:
              None
         """
+        lpr_rules = []
         self.log.info("* No. altered files: " + str(len(files_modified)))
         for o_drive in files_modified:
             name          = o_drive[1]
@@ -331,8 +350,9 @@ class CondeSyncRemote(object):
             sha1          = o_drive[8]
             dt_modified   = o_drive[10]
 
-            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], path_onedrive):
-                self.log.info("** keep directory only in onedrive: " + path_onedrive)
+            if self.cutils.check_exists_in_rules(self.dir_rules["only_onedrive"], path_onedrive):                
+                self.cutils.print_check_rules("** keep directory only in onedrive: ",path_onedrive,lpr_rules)
+                lpr_rules.append(path_onedrive)
                 continue
 
             dt_modified = datetime.strptime(dt_modified, "%Y-%m-%d %H:%M:%S.%f")
