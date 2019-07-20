@@ -3,6 +3,8 @@
 
 __author__ = Jackson Lopes
 __email__  = jacksonlopes@gmail.com
+__url__    = https://jslabs.cc
+__src__    = https://github.com/jacksonlopes/condedrive
 """
 import os
 import logging
@@ -65,8 +67,6 @@ class CondeSyncLocal(object):
             name_dir_local = list(v_dir.keys())[0]
             # TESTE/de/FOTOS
             name_dir_in_onedrive = v_dir[name_dir_local]
-            sql_insert = None
-            sql_update = None
             list_dir = self.cutils.get_list_files_in_hierarchy(name_dir_local)
             # convert hash files to update
             # converte hash de arquivos para update

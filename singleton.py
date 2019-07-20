@@ -3,6 +3,8 @@
 
 __author__ = Jackson Lopes
 __email__  = jacksonlopes@gmail.com
+__url__    = https://jslabs.cc
+__src__    = https://github.com/jacksonlopes/condedrive
 """
 # thanks http://blog.thedigitalcatonline.com/blog/2014/09/01/python-3-oop-part-5-metaclasses/#.V8dFlFbR_Ho
 class Singleton(type):

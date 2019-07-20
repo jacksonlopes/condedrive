@@ -25,4 +25,4 @@ Instructions:
 - Execute python conde.py  
 - Paste url in browser and cut return code.. paste in console  
 
-API DOC: https://jacksonlopes.github.io/doc/condedrive/html/
+API DOC: https://jslabs.cc/condedrive/doc/index.html

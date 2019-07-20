@@ -3,6 +3,8 @@
 
 __author__ = Jackson Lopes
 __email__  = jacksonlopes@gmail.com
+__url__    = https://jslabs.cc
+__src__    = https://github.com/jacksonlopes/condedrive
 """
 class CondeConstants(object):
     """Class constants."""
